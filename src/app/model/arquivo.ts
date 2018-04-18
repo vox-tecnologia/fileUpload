@@ -3,12 +3,10 @@ export class Arquivo {
   private _nome: string;
   private _tamanho: number;
   private _progress: number;
-  private _status: boolean;
-
-  private _isReady: any;
+  private _status: Array<Object>;
 
   constructor(
-    nome?: string, tamanho?: number, progress?: number, status?: boolean
+    nome?: string, tamanho?: number, progress?: number, status?: Array<Object>
   ) {
     this._nome = nome;
     this._tamanho = tamanho;
@@ -32,11 +30,4 @@ export class Arquivo {
     return this._status;
   }
 
-  get isReady() {
-    return this._isReady;
-  }
-
-  set isReady(ready) {
-    this._isReady = ready;
-  }
 }

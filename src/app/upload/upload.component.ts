@@ -1,12 +1,11 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FileItem, FileUploader } from 'ng2-file-upload';
 
 import { TypesEnum } from '../enum/types.enum';
 import { Arquivo } from '../model/arquivo';
 
-// const URL = '/api/';
-// const URL = 'http://localhost:3000/api-file';
-const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
+
+const URL = 'http://localhost:3000/api-file';
 
 @Component({
   selector: 'app-upload',
@@ -15,17 +14,16 @@ const URL = 'https://evening-anchorage-3159.herokuapp.com/api/';
 })
 export class UploadComponent implements OnInit {
 
-  // private _uploader: FileUploader;
+
   private _extensoes: Array<any>;
   private _alerts: string;
   private _arquivosEnviados: Array<any>;
   private _props: Array<Arquivo>;
 
-  public uploader = new FileUploader({url: URL});
+  public uploader: FileUploader;
 
   constructor() {
-      this._arquivosEnviados = [];
-     // this._uploader = new FileUploader({url: URL});
+    this.uploader = new FileUploader({url: URL});
   }
 
 
@@ -37,7 +35,8 @@ export class UploadComponent implements OnInit {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
       console.log(`Extensão: ${this.isValidaType(item)}`);
       console.log(`Tamanho: ${this.validarTamanho(item)}`);
-
+      console.log(item)
+      item.withCredentials = false;
       if (!this.validarTamanho(item)) {
         this._alerts = `O arquivo <strong>${item.file.name}</strong> possui tamanho maior que o permitido, Tamanho máximo permitido: 2MB`;
         item.remove();
@@ -51,17 +50,13 @@ export class UploadComponent implements OnInit {
     };
 
     this.uploader.onSuccessItem = (item: FileItem, response: string) => {
-        console.log(response)
-        console.log(item)
         const resposta = JSON.parse(response);
-        this._arquivosEnviados.push(resposta);
+        this._alerts = resposta;
     };
 
     this.uploader.onErrorItem = (item: FileItem, response: string) => {
-      console.log(response)
-        console.log(item)
         const resposta = JSON.parse(response);
-        const mensagem = 'O arquivo ' + item.file.name + ' não foi enviado. ' + resposta['mensagem'];
+        this._alerts = `O arquivo ${item.file.name} não foi enviado. ${resposta['mensagem']}`;
         item.remove();
     };
   }
@@ -90,25 +85,24 @@ export class UploadComponent implements OnInit {
 
   }
 
-  public uparArquivoServidor(item: FileItem): void {
-    item._onBuildForm = (form) => {
-        form.append('tipo', 'anexoRequerido');
-    };
-
-    item.upload();
-
-    this.uploader.onCompleteItem = (file: any, response: any, status: any, headers: any) => {
-        console.log(`file: ${file} response: ${response} status: ${status} headers: ${headers}`);
-    };
-}
-
   public getPropsFile(): Array<Arquivo> {
 
      this._props = this.uploader.queue.map(function(item) {
+
+      const status = [{
+            isCancel: item.isCancel,
+            isError: item.isError,
+            isReady: item.isReady,
+            isSuccess: item.isSuccess,
+            isUploaded: item.isUploaded,
+            isUploading: item.isUploading
+      }];
+
       const props = new Arquivo(
           item.file.name,
           item.file.size,
-          item.progress
+          item.progress,
+          status,
         );
         return props;
     });
@@ -121,6 +115,9 @@ export class UploadComponent implements OnInit {
     return this._alerts;
   }
 
+  public up() {
+    return this.uploader.queue;
+  }
 
   public get size() {
     return this.uploader.queue.length;
@@ -129,10 +126,10 @@ export class UploadComponent implements OnInit {
   public formateSize(bytes) {
 
     if (isNaN(bytes)) {
-      return;
+      return '';
     }
 
-    const sizes = ['Bytes', 'KB', 'MB'];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
 
     let amountOf2s = Math.floor(Math.log(+bytes) / Math.log(2));
 
