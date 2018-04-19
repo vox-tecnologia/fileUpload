@@ -131,31 +131,6 @@ export class UploadComponent implements OnInit {
     return this.extensao().toString().toLocaleUpperCase();
   }
 
-  public getPropsFile(): Array<Arquivo> {
-
-     this._props = this.uploader.queue.map(function(item) {
-
-        const itemStatus = {
-              isCancel: item.isCancel,
-              isError: item.isError,
-              isReady: item.isReady,
-              isSuccess: item.isSuccess,
-              isUploaded: item.isUploaded,
-              isUploading: item.isUploading
-        };
-
-        const props = new Arquivo(
-            item.file.name,
-            item.file.size,
-            item.progress,
-            itemStatus
-          );
-          return props;
-    });
-
-    return this._props;
-  }
-
   public formateSize(bytes) {
 
     if (isNaN(bytes)) {
