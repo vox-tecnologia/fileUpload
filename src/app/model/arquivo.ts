@@ -3,10 +3,10 @@ export class Arquivo {
   private _nome: string;
   private _tamanho: number;
   private _progress: number;
-  private _status: Array<Object>;
+  private _status: Object;
 
   constructor(
-    nome?: string, tamanho?: number, progress?: number, status?: Array<Object>
+    nome?: string, tamanho?: number, progress?: number, status?: Object
   ) {
     this._nome = nome;
     this._tamanho = tamanho;

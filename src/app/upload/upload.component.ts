@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
 import { FileItem, FileUploader } from 'ng2-file-upload';
 
 import { TypesEnum } from '../enum/types.enum';
 import { Arquivo } from '../model/arquivo';
-
 
 const URL = 'http://localhost:3000/api-file';
 
@@ -14,36 +13,61 @@ const URL = 'http://localhost:3000/api-file';
 })
 export class UploadComponent implements OnInit {
 
+  @Input() fileExt: string;
+  @Input() maxSize: number;
+  @Input() url: string;
 
   private _extensoes: Array<any>;
-  private _alerts: string;
   private _arquivosEnviados: Array<any>;
   private _props: Array<Arquivo>;
+  private _limtSize: number;
 
+  public errors: Array<string> = [];
   public uploader: FileUploader;
 
   constructor() {
-    this.uploader = new FileUploader({url: URL});
+    this.maxSize = 2;
+    this._limtSize = 10;
+    this.uploader = new FileUploader({
+      url: this.url
+    });
   }
 
 
   ngOnInit(): void {
-    console.log(this.adicionarArquivo());
+
+    if (isNaN(this.maxSize)) {
+      this.errors.push(`O valor da diretiva <strong>maxSize</strong> deve ser um valor inteiro`);
+      return;
+    }
+
+    if (this.url === '' || this.url === undefined) {
+      this.errors.push(`O valor da diretiva <strong>URL</strong> deve ser informado ex: url="http://localhost:3000/api"`);
+      return;
+    }
+
+    if (this.maxSize > this._limtSize) {
+      this.errors.push(`Limite para o envio de arquivos é no maximo <strong>${this._limtSize} MB</strong>`);
+      return;
+    }
+
   }
 
   public adicionarArquivo(): void {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
-      console.log(`Extensão: ${this.isValidaType(item)}`);
-      console.log(`Tamanho: ${this.validarTamanho(item)}`);
-      console.log(item)
+
       item.withCredentials = false;
-      if (!this.validarTamanho(item)) {
-        this._alerts = `O arquivo <strong>${item.file.name}</strong> possui tamanho maior que o permitido, Tamanho máximo permitido: 2MB`;
+      if (!this.isvalidarSize(item)) {
+        const err = `Error: (Tamanho) O <strong>${item.file.name}</strong> possui tamanho de
+                    <strong>${this.formateSize(item.file.size)}</strong>, Tamanho máximo permitido é : <strong>${this.maxSize} MB</strong>`;
+        this.errors.push(err);
         item.remove();
       }
 
       if (!this.isValidaType(item)) {
-        this._alerts = `O arquivo <strong>${item.file.name}</strong> possui extensão invalida. Arquivos validos PDF, PNG, JPEG, JPG`;
+        const err = `Error: (Extensão) o <strong>${item.file.name}</strong> possui extensão invalida. Extensões validas
+                    <strong>${this.msgExtensao()}</strong>`;
+        this.errors.push(err);
         item.remove();
       }
 
@@ -51,20 +75,22 @@ export class UploadComponent implements OnInit {
 
     this.uploader.onSuccessItem = (item: FileItem, response: string) => {
         const resposta = JSON.parse(response);
-        this._alerts = resposta;
+        this.errors.push(resposta);
     };
 
     this.uploader.onErrorItem = (item: FileItem, response: string) => {
-        const resposta = JSON.parse(response);
-        this._alerts = `O arquivo ${item.file.name} não foi enviado. ${resposta['mensagem']}`;
+        this.errors.push(`Não possivel enviar o arquivo <strong>${item.file.name}</strong>`);
         item.remove();
     };
   }
 
-  private validarTamanho(item: FileItem): boolean {
+  private isvalidarSize(item: FileItem): boolean {
 
-    if (item.file.size > 2097152) { // ~= 2MB;
-        return false;
+    const fileSizeinMB = item.file.size / (1024 * 1000);
+    const size = Math.round(fileSizeinMB * 100) / 100;
+
+    if (size > this.maxSize) {
+      return false;
     }
 
     return true;
@@ -72,61 +98,68 @@ export class UploadComponent implements OnInit {
 
   public isValidaType(item: FileItem): boolean {
 
-    const type = item.file.type.split('/');
-    const a = this.validarExtensao();
+    const type = item.file.name.split('.');
+    const fileExt = this.fileExt;
+    console.log(fileExt);
+    console.log(type);
 
-    return a.some(types => types === type[1]);
+    if (fileExt) {
+        const fileArray = this.fileExt.split(',');
+
+        return fileArray.some(types => {
+          return types.toLowerCase().trim() === type[type.length - 1];
+        });
+    }
+
+    const a = this.extensao();
+
+    return a.some(types => {
+      return types.toLowerCase().trim() === type[type.length - 1];
+    });
 
   }
 
-  public validarExtensao(): Array<string> {
-
+  public extensao(): Array<string> {
     return this._extensoes = [TypesEnum.PDF, TypesEnum.PNG, TypesEnum.JPEG, TypesEnum.JPG];
+  }
 
+  private msgExtensao(): string {
+    if (this.fileExt) {
+      return this.fileExt.toString().toLocaleUpperCase();
+    }
+
+    return this.extensao().toString().toLocaleUpperCase();
   }
 
   public getPropsFile(): Array<Arquivo> {
 
      this._props = this.uploader.queue.map(function(item) {
 
-      const status = [{
-            isCancel: item.isCancel,
-            isError: item.isError,
-            isReady: item.isReady,
-            isSuccess: item.isSuccess,
-            isUploaded: item.isUploaded,
-            isUploading: item.isUploading
-      }];
+        const itemStatus = {
+              isCancel: item.isCancel,
+              isError: item.isError,
+              isReady: item.isReady,
+              isSuccess: item.isSuccess,
+              isUploaded: item.isUploaded,
+              isUploading: item.isUploading
+        };
 
-      const props = new Arquivo(
-          item.file.name,
-          item.file.size,
-          item.progress,
-          status,
-        );
-        return props;
+        const props = new Arquivo(
+            item.file.name,
+            item.file.size,
+            item.progress,
+            itemStatus
+          );
+          return props;
     });
 
     return this._props;
   }
 
-
-  public get error () {
-    return this._alerts;
-  }
-
-  public up() {
-    return this.uploader.queue;
-  }
-
-  public get size() {
-    return this.uploader.queue.length;
-  }
-
   public formateSize(bytes) {
 
     if (isNaN(bytes)) {
-      return '';
+      return 'isNaN';
     }
 
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
