@@ -1,9 +1,7 @@
-import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FileItem, FileUploader } from 'ng2-file-upload';
 
 import { TypesEnum } from '../enum/types.enum';
-import { Arquivo } from '../model/arquivo';
-
 const URL = 'http://localhost:3000/api-file';
 
 @Component({
@@ -19,7 +17,6 @@ export class UploadComponent implements OnInit {
 
   private _extensoes: Array<any>;
   private _arquivosEnviados: Array<any>;
-  private _props: Array<Arquivo>;
   private _limtSize: number;
 
   public errors: Array<string> = [];
@@ -100,8 +97,6 @@ export class UploadComponent implements OnInit {
 
     const type = item.file.name.split('.');
     const fileExt = this.fileExt;
-    console.log(fileExt);
-    console.log(type);
 
     if (fileExt) {
         const fileArray = this.fileExt.split(',');
