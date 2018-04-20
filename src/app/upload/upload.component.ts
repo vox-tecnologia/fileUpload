@@ -28,10 +28,6 @@ export class UploadComponent implements OnInit {
     this._limtSize = 10;
     this.alerts = { status: false, msgs: [] };
 
-    // this.uploader = new FileUploader({});
-
-    console.log(`INPUT URL: ${this.path}`);
-    console.log(`URL: ${URL}`);
   }
 
   ngOnInit(): void {
@@ -40,15 +36,12 @@ export class UploadComponent implements OnInit {
       url: this.path
     });
 
-    // console.log(`INPUT URL: ${this.path}`);
-    // console.log(`URL: ${URL}`);
-
     this.adicionarArquivo();
 
     if (isNaN(this.maxSize)) {
       const err = `O valor da diretiva <strong>maxSize</strong> deve ser um valor inteiro`;
 
-      this.alerts['status'] = true;
+      this.alerts['status'] = false;
       this.alerts['msgs'].push(err);
 
       return;
@@ -57,7 +50,7 @@ export class UploadComponent implements OnInit {
     if (!this.path) {
       const err = `O valor da diretiva <strong>URL</strong> deve ser informado ex: url="http://localhost:3000/api"`;
 
-      this.alerts['status'] = true;
+      this.alerts['status'] = false;
       this.alerts['msgs'].push(err);
 
       return;
@@ -66,7 +59,7 @@ export class UploadComponent implements OnInit {
     if (this.maxSize > this._limtSize) {
       const err = `Limite para o envio de arquivos é no maximo <strong>${this._limtSize} MB</strong>`;
 
-      this.alerts['status'] = true;
+      this.alerts['status'] = false;
       this.alerts['msgs'].push(err);
 
       return;
