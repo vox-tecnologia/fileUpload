@@ -2,15 +2,15 @@
 
   <div class="row">
     <div class="col-md-12">
-      <div class="alert alert-error" [ngClass]="{'alert-success' : alerts.status, 'alert-danger' : alerts.status}" *ngIf="alerts">
 
+      <div class="alert alert-error" [ngClass]="{'alert-success' : alerts.status, 'alert-danger' : alerts.status}" *ngIf="alerts">
         <ul>
           <li *ngFor="let err of alerts.msgs">
             <span [innerHTML]="err"></span>
           </li>
         </ul>
-
       </div>
+      <!-- div alert -->
 
       <p>Quantidade de arquivos: {{ fileQtd(uploader.queue) }}</p>
       <input name="file" id="file" class="inputfile" type="file" ng2FileSelect [uploader]="uploader" multiple />
@@ -27,7 +27,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of uploader.queue; let idx = index">
+          <tr *ngFor="let item of uploader.queue;">
             <td>
               <strong>{{ item?.file?.name }}</strong>
             </td>
@@ -35,7 +35,7 @@
                 <strong>{{ formateSize(item?.file?.size) }}</strong>
             </td>
             <td class="text-center" *ngIf="uploader.options.isHTML5">
-              <div class="progress" style="margin-bottom: 0;">
+              <div class="progress">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" [ngStyle]="{ 'width': item.progress + '%' }">
                   {{ item.progress }} %
                 </div>

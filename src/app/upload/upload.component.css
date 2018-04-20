@@ -1,44 +1,32 @@
-.my-drop-zone {
-  border: dotted 3px lightgray;
-}
-
-.nv-file-over {
-  border: dotted 3px red;
-}
+.nv-file-over { border: dotted 3px red; }
 
 /* Default class applied to drop zones on over */
 
-.another-file-over-class {
-  border: dotted 3px green;
-}
+.another-file-over-class { border: dotted 3px green; }
 
 .inputfile {
+  position: absolute;
   width: 0.1px;
   height: 0.1px;
   opacity: 0;
   overflow: hidden;
-  position: absolute;
   z-index: -1;
 }
 
 .inputfile+label {
-  font-size: 1.25em;
   padding: 10px;
+  display: inline-block;
+  font-size: 1.25em;
   font-weight: 700;
   color: white;
   background-color: #212529;
-  display: inline-block;
+
 }
 
 .inputfile:focus+label,
-.inputfile+label:hover {
-  background-color: #000;
-}
+.inputfile+label:hover { background-color: #000; }
 
-.inputfile+label {
-  cursor: pointer;
-  /* "hand" cursor */
-}
+.inputfile+label { cursor: pointer; }
 
 .inputfile:focus+label {
   outline: 1px dotted #212529;
@@ -55,17 +43,14 @@
   outline: -webkit-focus-ring-color auto 5px;
 }
 
+.queue-progress{ margin-bottom: 15px; }
+.fa-1x { font-size: 1em; }
 
-.queue-progress{
-  margin-bottom: 15px;
+.alert-error ul,
+.alert-error li {
+  padding: 0;
+  margin: 0;
 }
 
-.fa-1x {
-  font-size: 1em;
-}
-
-.alert-error li, ul{
- list-style: none;
- padding: 0;
- margin: 0;
-}
+.alert-error li { list-style: none; }
+.progress{ margin-bottom: 0; }
