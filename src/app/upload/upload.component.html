@@ -3,9 +3,11 @@
   <div class="row">
     <div class="col-md-12">
 
-      <div class="alert alert-error" [ngClass]="{'alert-success' : alerts.status, 'alert-danger' : alerts.status}" *ngIf="alerts">
+      <div class="alert alert-error"
+        [ngClass]="{'alert-success' : true === alerts.status, 'alert-danger' : false === alerts.status}"
+        *ngIf="alerts['msgs'].length || alerts['status'] === true">
         <ul>
-          <li *ngFor="let err of alerts.msgs">
+          <li *ngFor="let err of alerts['msgs']">
             <span [innerHTML]="err"></span>
           </li>
         </ul>

@@ -2,7 +2,8 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FileItem, FileUploader } from 'ng2-file-upload';
 
 import { TypesEnum } from '../enum/types.enum';
-const URL = 'http://localhost:3000/api-file';
+
+const URL = 'http://localhost:6969/api';
 
 @Component({
   selector: 'app-vox-upload',
@@ -13,7 +14,7 @@ export class UploadComponent implements OnInit {
 
   @Input() fileExt: string;
   @Input() maxSize: number;
-  @Input() url: string;
+  @Input() path: string;
 
   private _extensoes: Array<any>;
   private _limtSize: number;
@@ -22,16 +23,25 @@ export class UploadComponent implements OnInit {
   public uploader: FileUploader;
 
   constructor() {
-    this.maxSize = 2;
+
+    this.maxSize = 1;
     this._limtSize = 10;
     this.alerts = { status: false, msgs: [] };
-    this.uploader = new FileUploader({
-      url: this.url
-    });
+
+    // this.uploader = new FileUploader({});
+
+    console.log(`INPUT URL: ${this.path}`);
+    console.log(`URL: ${URL}`);
   }
 
-
   ngOnInit(): void {
+
+    this.uploader = new FileUploader({
+      url: this.path
+    });
+
+    // console.log(`INPUT URL: ${this.path}`);
+    // console.log(`URL: ${URL}`);
 
     this.adicionarArquivo();
 
@@ -44,7 +54,7 @@ export class UploadComponent implements OnInit {
       return;
     }
 
-    if (!this.url) {
+    if (!this.path) {
       const err = `O valor da diretiva <strong>URL</strong> deve ser informado ex: url="http://localhost:3000/api"`;
 
       this.alerts['status'] = true;
@@ -64,6 +74,8 @@ export class UploadComponent implements OnInit {
 
   }
 
+
+
   public adicionarArquivo(): void {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
 
@@ -71,7 +83,7 @@ export class UploadComponent implements OnInit {
       if (!this.isvalidarSize(item)) {
         const err = `Error: (Tamanho) O <strong>${item.file.name}</strong> possui tamanho de
                     <strong>${this.formateSize(item.file.size)}</strong>, Tamanho máximo permitido é : <strong>${this.maxSize} MB</strong>`;
-        this.alerts['status'] = true;
+        this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
         item.remove();
       }
@@ -80,7 +92,7 @@ export class UploadComponent implements OnInit {
         const err = `Error: (Extensão) o <strong>${item.file.name}</strong> possui extensão invalida. Extensões validas
                     <strong>${this.msgExtension()}</strong>`;
 
-        this.alerts['status'] = true;
+        this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
         item.remove();
       }
@@ -97,7 +109,7 @@ export class UploadComponent implements OnInit {
     this.uploader.onErrorItem = (item: FileItem, response: string) => {
         const err = `Não possivel enviar o arquivo <strong>${item.file.name}</strong>`;
 
-        this.alerts['status'] = true;
+        this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
 
         item.remove();
