@@ -5,7 +5,7 @@ import { TypesEnum } from '../enum/types.enum';
 const URL = 'http://localhost:3000/api-file';
 
 @Component({
-  selector: 'app-vox-upload',
+  selector: 'app-upload',
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.css']
 })
@@ -16,6 +16,7 @@ export class UploadComponent implements OnInit {
   @Input() url: string;
 
   private _extensoes: Array<any>;
+  private _arquivosEnviados: Array<any>;
   private _limtSize: number;
 
   public alerts: Object;
@@ -138,7 +139,7 @@ export class UploadComponent implements OnInit {
   }
 
   public extension(): Array<string> {
-    return this._extensoes = [TypesEnum.PDF, TypesEnum.PNG, TypesEnum.JPEG, TypesEnum.JPG, TypesEnum.CSV];
+    return this._extensoes = [TypesEnum.PDF, TypesEnum.PNG, TypesEnum.JPEG, TypesEnum.JPG];
   }
 
   private msgExtension(): string {
@@ -149,11 +150,11 @@ export class UploadComponent implements OnInit {
     return this.extension().toString().toLocaleUpperCase();
   }
 
-  public fileQtd(item): number | string {
-    return item.length === 0 ? 'Não há arquivos anexados' : item.length;
-  }
-
   public formateSize(bytes) {
+
+    if (isNaN(bytes)) {
+      return 'isNaN';
+    }
 
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
 

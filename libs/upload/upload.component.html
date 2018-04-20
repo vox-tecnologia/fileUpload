@@ -1,18 +1,21 @@
 <div class="container">
 
   <div class="row">
+
     <div class="col-md-12">
       <div class="alert alert-error" [ngClass]="{'alert-success' : alerts.status, 'alert-danger' : alerts.status}" *ngIf="alerts">
 
         <ul>
           <li *ngFor="let err of alerts.msgs">
+            <fa name="fas fa-1x fa-times-circle" *ngIf="alerts.status"></fa>
+            <fa name="fas fa-1x fa-check-circle" *ngIf="alerts.status"></fa>
             <span [innerHTML]="err"></span>
           </li>
         </ul>
 
       </div>
 
-      <p>Quantidade de arquivos: {{ fileQtd(uploader.queue) }}</p>
+      <p>Quantidade de arquivos: {{ uploader.queue.length }}</p>
       <input name="file" id="file" class="inputfile" type="file" ng2FileSelect [uploader]="uploader" multiple />
       <label for="file">Selecionar Arquivos</label>
 
