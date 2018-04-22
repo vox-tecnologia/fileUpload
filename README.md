@@ -1,27 +1,54 @@
-# FileUpload
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.2.
+## 1. Install Vox Upload globally:
 
-## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+```sh
+$ npm install --global file-upload
+```
 
-## Code scaffolding
+## 2. Install Vox Upload in your project devDependencies:
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```sh
+$ npm install --save-dev file-upload
+```
 
-## Build
+## 3. Setup Module
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+Import UploadModule into your app.module.
 
-## Running unit tests
+```ts
+import { UploadModule } from 'upload/upload.module';
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+@NgModule({
+  ...
+  imports: [
+    UploadModule
+  ],
+})
+```
+## 4. Setup 
 
-## Running end-to-end tests
+Default
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+```html
+<app-vox-upload></app-upload>
+```
 
-## Further help
+Custom
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+```html
+<app-vox-upload 
+    maxSize="2"
+    url="http://localhost:3000/api-file"
+    fileExt="pg, pdf, txt, icon">
+</app-upload>
+```
+
+
+## 5. Usage and options
+
+Name      | Type               | Exemples                         | Optional              | Options Default        
+---       | ---                | ---                              | ----                  | ---
+fileExt   | `String`           | `jpg, pdf, txt, icon`            | Yes                   | ` pdf, png, jpeg, jpg, csv`
+maxSize   | `number`           | `10`                             | Yes                   | `2 MB`
+url       | `String`           | `http://localhost:3000/api-file` | No                    | No
