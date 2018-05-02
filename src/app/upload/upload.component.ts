@@ -1,8 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output  } from '@angular/core';
+
 import { FileItem, FileUploader } from 'ng2-file-upload';
 
 import { TypesEnum } from '../enum/types.enum';
-
 const URL = 'http://localhost:6969/api';
 
 @Component({
@@ -14,29 +14,36 @@ export class UploadComponent implements OnInit {
 
   @Input() fileExt: string;
   @Input() maxSize: number;
-  @Input() path: string;
+  @Input() url: string;
+  @Input() anexosRequeridos: Array<any>;
 
-  private _extensoes: Array<any>;
+  private _extensoes: Array<string>;
   private _limtSize: number;
+  private _fileItem: Array<any>;
 
   public alerts: Object;
   public uploader: FileUploader;
-
+  public rows: Array<any>;
+  public isUp: boolean;
   constructor() {
 
-    this.maxSize = 1;
-    this._limtSize = 10;
+    this._limtSize = 2;  // limite maximo para anexos de arquivos
+    this._fileItem = [];
+    this.maxSize = 10;
+    this.anexosRequeridos = [];
+    this.rows = [];
+    this.isUp = false;
     this.alerts = { status: false, msgs: [] };
 
   }
 
   ngOnInit(): void {
-
     this.uploader = new FileUploader({
-      url: this.path
+      url: this.url
     });
 
-    this.adicionarArquivo();
+    this.initFile();
+    /// this.teste();
 
     if (isNaN(this.maxSize)) {
       const err = `O valor da diretiva <strong>maxSize</strong> deve ser um valor inteiro`;
@@ -47,7 +54,7 @@ export class UploadComponent implements OnInit {
       return;
     }
 
-    if (!this.path) {
+    if (!this.url) {
       const err = `O valor da diretiva <strong>URL</strong> deve ser informado ex: url="http://localhost:3000/api"`;
 
       this.alerts['status'] = false;
@@ -67,27 +74,27 @@ export class UploadComponent implements OnInit {
 
   }
 
-
-
-  public adicionarArquivo(): void {
+  public initFile(): void {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
+
+      this.setFileItem(item);
 
       item.withCredentials = false;
       if (!this.isvalidarSize(item)) {
+        item.remove();
         const err = `Error: (Tamanho) O <strong>${item.file.name}</strong> possui tamanho de
                     <strong>${this.formateSize(item.file.size)}</strong>, Tamanho máximo permitido é : <strong>${this.maxSize} MB</strong>`;
         this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
-        item.remove();
       }
 
       if (!this.isValidaType(item)) {
+        item.remove();
         const err = `Error: (Extensão) o <strong>${item.file.name}</strong> possui extensão invalida. Extensões validas
                     <strong>${this.msgExtension()}</strong>`;
 
         this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
-        item.remove();
       }
 
     };
@@ -100,12 +107,12 @@ export class UploadComponent implements OnInit {
     };
 
     this.uploader.onErrorItem = (item: FileItem, response: string) => {
+        item.remove();
         const err = `Não possivel enviar o arquivo <strong>${item.file.name}</strong>`;
 
         this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
 
-        item.remove();
     };
   }
 
@@ -134,9 +141,7 @@ export class UploadComponent implements OnInit {
         });
     }
 
-    const a = this.extension();
-
-    return a.some(types => {
+    return this.extension().some(types => {
       return types.toLowerCase().trim() === type[type.length - 1];
     });
 
@@ -176,6 +181,44 @@ export class UploadComponent implements OnInit {
     }
 
     return `${bytes} ${sizes[i]}`;
+
+  }
+
+  public getAnexos(): Array<any> {
+    return this.anexosRequeridos;
+  }
+
+  public icon(icon: string): string {
+      return this.extension().filter(ext => {
+          return icon === ext;
+      }).join('');
+
+  }
+
+  public setFileItem(item: FileItem) {
+    this._fileItem.push(item);
+
+  }
+
+  public getFileItem(): Array<FileItem> {
+    return this._fileItem;
+  }
+
+  public clickedRow(anexoId: number): void {
+    this.rows.push(anexoId);
+    this.teste();
+  }
+
+  teste() { // sempre retorn true;
+    const qtd = this.uploader.queue.length;
+
+    if (qtd === 0) {
+      console.log('0 items na lista');
+      return false;
+    } else {
+      console.log('alguma coisa na lista');
+      return true;
+    }
 
   }
 }
