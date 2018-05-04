@@ -1,8 +1,9 @@
-import { Component, OnInit, Input, Output  } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 import { FileItem, FileUploader } from 'ng2-file-upload';
 
 import { TypesEnum } from '../enum/types.enum';
+
 const URL = 'http://localhost:6969/api';
 
 @Component({
@@ -23,18 +24,18 @@ export class UploadComponent implements OnInit {
 
   public alerts: Object;
   public uploader: FileUploader;
-  public rows: Array<any>;
-  public isUp: boolean;
+  public rows: Array<number>;
+  public isUp: Array<boolean>;
+  public actions: Object;
   constructor() {
-
     this._limtSize = 2;  // limite maximo para anexos de arquivos
     this._fileItem = [];
-    this.maxSize = 10;
+    this.maxSize = 2;
     this.anexosRequeridos = [];
     this.rows = [];
-    this.isUp = false;
+    this.isUp = [];
     this.alerts = { status: false, msgs: [] };
-
+    this.actions = { isSuccess: false, isCancel: false, isError: false };
   }
 
   ngOnInit(): void {
@@ -43,8 +44,7 @@ export class UploadComponent implements OnInit {
     });
 
     this.initFile();
-    /// this.teste();
-
+    console.log(this.uploader.queue);
     if (isNaN(this.maxSize)) {
       const err = `O valor da diretiva <strong>maxSize</strong> deve ser um valor inteiro`;
 
@@ -77,6 +77,8 @@ export class UploadComponent implements OnInit {
   public initFile(): void {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
 
+      console.log(this.uploader.queue, 'onAfterAddingFile');
+
       this.setFileItem(item);
 
       item.withCredentials = false;
@@ -90,7 +92,7 @@ export class UploadComponent implements OnInit {
 
       if (!this.isValidaType(item)) {
         item.remove();
-        const err = `Error: (Extensão) o <strong>${item.file.name}</strong> possui extensão invalida. Extensões validas
+        const err = `Error: (Extensão) O <strong>${item.file.name}</strong> possui extensão invalida. Extensões validas
                     <strong>${this.msgExtension()}</strong>`;
 
         this.alerts['status'] = false;
@@ -104,16 +106,26 @@ export class UploadComponent implements OnInit {
 
         this.alerts['status'] = true;
         this.alerts['msgs'].push(err);
+
+        this.isUp = this.isUp.map(ele => ele = false);
+        // item.remove();
     };
 
     this.uploader.onErrorItem = (item: FileItem, response: string) => {
-        item.remove();
-        const err = `Não possivel enviar o arquivo <strong>${item.file.name}</strong>`;
 
-        this.alerts['status'] = false;
-        this.alerts['msgs'].push(err);
+      const err = `Não foi possivel enviar o arquivo <strong>${item.file.name}</strong>`;
+
+      this.alerts['status'] = false;
+      this.alerts['msgs'].push(err);
+
+      this.isUp = this.isUp.map(ele => ele = false);
 
     };
+
+    this.uploader.onCompleteItem = (item: FileItem, response: string) => {
+      // item.remove();
+    };
+
   }
 
   private isvalidarSize(item: FileItem): boolean {
@@ -128,13 +140,13 @@ export class UploadComponent implements OnInit {
     return true;
   }
 
-  public isValidaType(item: FileItem): boolean {
+  private isValidaType(item: FileItem): boolean {
 
     const type = item.file.name.split('.');
     const fileExt = this.fileExt;
 
     if (fileExt) {
-        const fileArray = this.fileExt.split(',');
+        const fileArray = this.fileExt.toString().split(',');
 
         return fileArray.some(types => {
           return types.toLowerCase().trim() === type[type.length - 1];
@@ -147,7 +159,7 @@ export class UploadComponent implements OnInit {
 
   }
 
-  public extension(): Array<string> {
+  private extension(): Array<string> {
     return this._extensoes = [TypesEnum.PDF, TypesEnum.PNG, TypesEnum.JPEG, TypesEnum.JPG, TypesEnum.CSV];
   }
 
@@ -159,7 +171,7 @@ export class UploadComponent implements OnInit {
     return this.extension().toString().toLocaleUpperCase();
   }
 
-  public fileQtd(item): number | string {
+  public fileQtd(item: Array<FileItem>): number | string {
     return item.length === 0 ? 'Não há arquivos anexados' : item.length;
   }
 
@@ -188,14 +200,13 @@ export class UploadComponent implements OnInit {
     return this.anexosRequeridos;
   }
 
-  public icon(icon: string): string {
+  public icon(icon: string): string[] {
       return this.extension().filter(ext => {
-          return icon === ext;
-      }).join('');
-
+        return icon === ext;
+      });
   }
 
-  public setFileItem(item: FileItem) {
+  public setFileItem(item: FileItem): void {
     this._fileItem.push(item);
 
   }
@@ -204,21 +215,20 @@ export class UploadComponent implements OnInit {
     return this._fileItem;
   }
 
-  public clickedRow(anexoId: number): void {
-    this.rows.push(anexoId);
-    this.teste();
-  }
-
-  teste() { // sempre retorn true;
-    const qtd = this.uploader.queue.length;
-
-    if (qtd === 0) {
-      console.log('0 items na lista');
-      return false;
-    } else {
-      console.log('alguma coisa na lista');
-      return true;
-    }
+  public changeRow(anexoId: number, idx: number): void {
+    this.rows[idx] = anexoId;
+    this.isUp[idx] = true;
 
   }
+
+  public uploadAll(): void {
+    this.uploader.uploadAll();
+  }
+
+  public clearQueue(): void {
+    this.uploader.clearQueue();
+    this.isUp = this.isUp.map(ele => ele = false);
+  }
+
+
 }

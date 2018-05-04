@@ -18,7 +18,11 @@
   </div>
   <!-- div.modal-header -->
   <div class="modal-body">
-    
+      <app-vox-upload
+      [url]="getUrl"
+      [fileExt]="getExtesao()"
+      [anexosRequeridos]="anexos()">
+    </app-vox-upload>
   </div>
   <!-- div.modal-body -->
   <div class="modal-footer">
@@ -28,17 +32,10 @@
 
 </ng-template>
 
-<button class="btn btn-lg btn-outline-primary" (click)="open(content)">
-  <!-- <fa name="fas fa-cloud-upload"></fa> -->
-  Anexar Arquvios</button>
 
 <div class="container">
-
-  <app-vox-upload
-      maxSize="2"
-      [url]="getUrl"
-      fileExt="png, pdf, txt, ico"
-      [anexosRequeridos]="anexos()">
-  </app-vox-upload>
-
+    <button class="btn btn-outline-primary" (click)="open(content)">
+        <i class="fa fa-2x fa-cloud-upload"></i>
+       <span>Anexar Arquvios</span>
+      </button>
 </div>

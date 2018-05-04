@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 import { UploadComponent } from './upload/upload.component';
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +9,7 @@ import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
- 
+
   public title = 'app';
   public getUrl: string;
   public extesao: Array<string>;
@@ -31,9 +31,9 @@ export class AppComponent {
   }
 
   public getExtesao () {
-    return ['png, pdf, txt, icon'];
+    return ['png', 'pdf'];
   }
-  
+
   public anexos() {
 
     const anexos = [
@@ -56,4 +56,5 @@ export class AppComponent {
 
     return anexos;
   }
+
 }

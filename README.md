@@ -31,7 +31,9 @@ import { UploadModule } from 'upload/upload.module';
 Default
 
 ```html
-<app-vox-upload></app-upload>
+<app-vox-upload
+  [url]="getUrl">
+</app-upload>
 ```
 
 Custom
