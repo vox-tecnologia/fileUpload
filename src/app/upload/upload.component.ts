@@ -35,7 +35,6 @@ export class UploadComponent implements OnInit {
     this.rows = [];
     this.isUp = [];
     this.alerts = { status: false, msgs: [] };
-    this.actions = { isSuccess: false, isCancel: false, isError: false };
   }
 
   ngOnInit(): void {
@@ -44,7 +43,7 @@ export class UploadComponent implements OnInit {
     });
 
     this.initFile();
-    console.log(this.uploader.queue);
+
     if (isNaN(this.maxSize)) {
       const err = `O valor da diretiva <strong>maxSize</strong> deve ser um valor inteiro`;
 
@@ -76,8 +75,6 @@ export class UploadComponent implements OnInit {
 
   public initFile(): void {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
-
-      console.log(this.uploader.queue, 'onAfterAddingFile');
 
       this.setFileItem(item);
 

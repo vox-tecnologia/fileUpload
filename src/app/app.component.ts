@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 
 import { UploadComponent } from './upload/upload.component';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
@@ -22,7 +22,7 @@ export class AppComponent {
   }
 
 
-  open(content) {
+  public open(content) {
     this.modalService.open(content, { size: 'lg', centered: true}).result.then((result) => {
       // this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
