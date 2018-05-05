@@ -1,77 +1,62 @@
-<div class="container">
+<div class="row">
+  <div class="col-md-12">
 
-  <div class="row">
-    <div class="col-md-12">
-
-      <div class="alert alert-error"
-        [ngClass]="{'alert-success' : true === alerts.status, 'alert-danger' : false === alerts.status}"
-        *ngIf="alerts['msgs'].length || alerts['status'] === true">
-        <ul>
-          <li *ngFor="let err of alerts['msgs']">
-            <span [innerHTML]="err"></span>
-          </li>
-        </ul>
-      </div>
-      <!-- div alert -->
-
-      <p>Quantidade de arquivos: {{ fileQtd(uploader.queue) }}</p>
-      <input name="file" id="file" class="inputfile" type="file" ng2FileSelect [uploader]="uploader" multiple />
-      <label for="file">Selecionar Arquivos</label>
-
-      <table class="table table-bordered">
-        <thead class="table-striped table-dark">
-          <tr>
-            <th>Name</th>
-            <th>Tamanho</th>
-            <th class="text-center">Progresso</th>
-            <th class="text-center">Status</th>
-            <th class="text-center">Ação</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of uploader.queue;">
-            <td>
-              <strong>{{ item?.file?.name }}</strong>
-            </td>
-            <td>
-                <strong>{{ formateSize(item?.file?.size) }}</strong>
-            </td>
-            <td class="text-center" *ngIf="uploader.options.isHTML5">
-              <div class="progress">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" [ngStyle]="{ 'width': item.progress + '%' }">
-                  {{ item.progress }} %
-                </div>
-              </div>
-            </td>
-
-            <td class="text-center">
-                <span *ngIf="item.isSuccess" [ngClass]="{'text-success' : item.isSuccess}" ><fa name="fas fa-2x fa-check-circle"></fa></span>
-                <span *ngIf="item.isCancel" [ngClass]="{'text-warning' : item.isCancel}"><fa name="fas fa-2x fa-exclamation-circle"></fa></span>
-                <span *ngIf="item.isError" [ngClass]="{'text-danger' : item.isError}"><fa name="fas fa-2x fa-times-circle"></fa></span>
-            </td>
-
-            <td class="text-center">
-              <button type="button" class="btn btn-success btn-xs" (click)="item.upload()" [disabled]="item.isReady || item.isUploading || item.isSuccess">
-                  <fa name="fas fa-cloud-upload"></fa> Upload
-              </button>
-              <button type="button" class="btn btn-warning btn-xs" (click)="item.cancel()" [disabled]="!item.isUploading">
-                  <fa name="fas fa-exclamation-circle"></fa> Cancel
-              </button>
-              <button type="button" class="btn btn-danger btn-xs" (click)="item.remove()">
-                <fa name="fas fa-times-circle"></fa> Remove
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="alert alert-error" [ngClass]="{'alert-success' : true === alerts.status, 'alert-danger' : false === alerts.status}"
+      *ngIf="alerts['msgs'].length || alerts['status'] === true">
+      <ul>
+        <li *ngFor="let err of alerts['msgs']">
+          <span [innerHTML]="err"></span>
+        </li>
+      </ul>
     </div>
+    <!-- div alert -->
+    <p>Arquivos selecionados: {{ fileQtd(uploader.queue) }}</p>
+
+    <table class="table table-bordered">
+      <thead class="table-striped table-dark">
+        <tr class="header">
+          <th>Descrição de Anexo</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Formato</th>
+          <th class="text-center">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let anexo of getAnexos(); let idx = index">
+          <td>
+            {{ anexo?.descricao }}
+          </td>
+
+          <td class="text-center">
+              <span *ngIf="uploader.queue[idx]?.isSuccess" [ngClass]="{'text-success' : uploader.queue[idx]?.isSuccess}" ><i class="fa fa-2x fa-check-circle"></i></span>
+              <span *ngIf="uploader.queue[idx]?.isCancel" [ngClass]="{'text-warning' : uploader.queue[idx]?.isCancel}"><i class="fa fa-2x fa-exclamation-circle"></i></span>
+              <span *ngIf="uploader.queue[idx]?.isError" [ngClass]="{'text-danger' : uploader.queue[idx]?.isError}"><i class="fa fa-2x fa-times-circle"></i></span>
+          </td>
+          <td class="text-center">
+              <i class="fa fa-2x fa-file-{{ icon(anexo.extensao[0].descricao) }}-o"></i>
+              <strong class="file-extensao">{{ anexo.extensao[0].descricao }}</strong>
+          </td>
+          <td class="text-center">
+            <div class="box-file">
+                <input name="file" class="inputfile" type="file" (change)="changeRow(anexo.id, idx)" ng2FileSelect [uploader]="uploader" />
+                <span [hidden]="isUp[idx]">
+                    <label class="btn btn-success btn-sm" for="file"><i class="fa fa-cloud-upload"></i> Selecionar</label>
+                </span>
+
+                <span [hidden]="!isUp[idx]">
+                    <label class="btn btn-success btn-sm" for="file"><i class="fa fa-cloud-upload"></i> Alterar</label>
+                </span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <div class="row">
-    <div class="col-md-12">
+</div>
 
-      <div>
-
-        <div class="queue-progress">
+<div class="row">
+  <div class="col-md-12">
+      <div class="queue-progress">
           Progresso:
           <div class="progress">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" [ngStyle]="{ 'width': uploader.progress + '%' }">
@@ -80,18 +65,11 @@
           </div>
         </div>
 
-        <button type="button" class="btn btn-success btn-s" (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
-            <fa name="fas fa-cloud-upload"></fa> Upload all
+        <button type="button" class="btn btn-success" (click)="uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
+          <i class="fa fa-cloud-upload"></i> Enviar
         </button>
-        <button type="button" class="btn btn-warning btn-s" (click)="uploader.cancelAll()" [disabled]="!uploader.isUploading">
-            <fa name="fas  fa-exclamation-circle"></fa> Cancel all
+        <button type="button" class="btn btn-danger" (click)="clearQueue()" [disabled]="!uploader.queue.length">
+          <i class="fa fa-times-circle"></i> Remover
         </button>
-        <button type="button" class="btn btn-danger btn-s" (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
-            <fa name="fas fa-times-circle"></fa> Remove all
-        </button>
-      </div>
-
-    </div>
   </div>
-
 </div>

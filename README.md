@@ -31,17 +31,20 @@ import { UploadModule } from 'upload/upload.module';
 Default
 
 ```html
-<app-vox-upload></app-upload>
+<app-vox-upload
+  [url]="getUrl">
+</app-upload>
 ```
 
 Custom
 
 ```html
-<app-vox-upload 
+<app-vox-upload
     maxSize="2"
-    url="http://localhost:3000/api-file"
-    fileExt="pg, pdf, txt, icon">
-</app-upload>
+    [url]="getUrl"
+    [fileExt]="getExtesao()"
+    [anexosRequeridos]="anexos()">
+</app-vox-upload>
 ```
 
 
