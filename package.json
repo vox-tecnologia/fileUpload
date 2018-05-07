@@ -28,7 +28,7 @@
     "url": "https://github.com/ferreirajose/fileUpload/issues"
   },
   "homepage": "https://github.com/ferreirajose/fileUpload#readme",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "^5.2.0",
     "@angular/common": "^5.2.0",

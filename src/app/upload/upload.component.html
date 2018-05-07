@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-12">
 
-    <div class="alert alert-error" [ngClass]="{'alert-success' : true === alerts.status, 'alert-danger' : false === alerts.status}"
+    <div class="alert alert-error" [ngClass]="getAlert()"
       *ngIf="alerts['msgs'].length || alerts['status'] === true">
       <ul>
         <li *ngFor="let err of alerts['msgs']">
@@ -26,7 +26,6 @@
           <td>
             {{ anexo?.descricao }}
           </td>
-
           <td class="text-center">
               <span *ngIf="uploader.queue[idx]?.isSuccess" [ngClass]="{'text-success' : uploader.queue[idx]?.isSuccess}" ><i class="fa fa-2x fa-check-circle"></i></span>
               <span *ngIf="uploader.queue[idx]?.isCancel" [ngClass]="{'text-warning' : uploader.queue[idx]?.isCancel}"><i class="fa fa-2x fa-exclamation-circle"></i></span>

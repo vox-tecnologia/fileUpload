@@ -23,11 +23,7 @@ export class AppComponent {
 
 
   public open(content) {
-    this.modalService.open(content, { size: 'lg', centered: true}).result.then((result) => {
-      // this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      // this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
+    this.modalService.open(content, { size: 'lg', centered: true});
   }
 
   public getExtesao () {

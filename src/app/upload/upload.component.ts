@@ -4,7 +4,6 @@ import { FileItem, FileUploader } from 'ng2-file-upload';
 
 import { TypesEnum } from '../enum/types.enum';
 
-const URL = 'http://localhost:6969/api';
 
 @Component({
   selector: 'app-vox-upload',
@@ -20,16 +19,15 @@ export class UploadComponent implements OnInit {
 
   private _extensoes: Array<string>;
   private _limtSize: number;
-  private _fileItem: Array<any>;
 
   public alerts: Object;
   public uploader: FileUploader;
   public rows: Array<number>;
   public isUp: Array<boolean>;
   public actions: Object;
+
   constructor() {
     this._limtSize = 2;  // limite maximo para anexos de arquivos
-    this._fileItem = [];
     this.maxSize = 2;
     this.anexosRequeridos = [];
     this.rows = [];
@@ -76,8 +74,6 @@ export class UploadComponent implements OnInit {
   public initFile(): void {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
 
-      this.setFileItem(item);
-
       item.withCredentials = false;
       if (!this.isvalidarSize(item)) {
         item.remove();
@@ -85,16 +81,22 @@ export class UploadComponent implements OnInit {
                     <strong>${this.formateSize(item.file.size)}</strong>, Tamanho máximo permitido é : <strong>${this.maxSize} MB</strong>`;
         this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
+
+        return;
       }
 
       if (!this.isValidaType(item)) {
         item.remove();
-        const err = `Error: (Extensão) O <strong>${item.file.name}</strong> possui extensão invalida. Extensões validas
+        const err = `Error: (Extensão) O <strong>${item.file.name}</strong> possui extensão inválida. Extensões validas
                     <strong>${this.msgExtension()}</strong>`;
 
         this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
+
+        return;
       }
+
+      this.alerts['msgs'] = [];
 
     };
 
@@ -104,23 +106,17 @@ export class UploadComponent implements OnInit {
         this.alerts['status'] = true;
         this.alerts['msgs'].push(err);
 
-        this.isUp = this.isUp.map(ele => ele = false);
-        // item.remove();
+        this.clearTextOptions();
+        item.remove();
     };
 
     this.uploader.onErrorItem = (item: FileItem, response: string) => {
+        const err = `Não foi possivel enviar o arquivo <strong>${item.file.name}</strong>`;
 
-      const err = `Não foi possivel enviar o arquivo <strong>${item.file.name}</strong>`;
+        this.alerts['status'] = false;
+        this.alerts['msgs'].push(err);
 
-      this.alerts['status'] = false;
-      this.alerts['msgs'].push(err);
-
-      this.isUp = this.isUp.map(ele => ele = false);
-
-    };
-
-    this.uploader.onCompleteItem = (item: FileItem, response: string) => {
-      // item.remove();
+        this.clearTextOptions();
     };
 
   }
@@ -172,7 +168,7 @@ export class UploadComponent implements OnInit {
     return item.length === 0 ? 'Não há arquivos anexados' : item.length;
   }
 
-  public formateSize(bytes) {
+  public formateSize(bytes): string {
 
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
 
@@ -197,25 +193,15 @@ export class UploadComponent implements OnInit {
     return this.anexosRequeridos;
   }
 
-  public icon(icon: string): string[] {
+  public icon(icon: string): Array<string> {
       return this.extension().filter(ext => {
         return icon === ext;
       });
   }
 
-  public setFileItem(item: FileItem): void {
-    this._fileItem.push(item);
-
-  }
-
-  public getFileItem(): Array<FileItem> {
-    return this._fileItem;
-  }
-
   public changeRow(anexoId: number, idx: number): void {
     this.rows[idx] = anexoId;
     this.isUp[idx] = true;
-
   }
 
   public uploadAll(): void {
@@ -224,8 +210,18 @@ export class UploadComponent implements OnInit {
 
   public clearQueue(): void {
     this.uploader.clearQueue();
+    this.clearTextOptions();
+  }
+
+  private clearTextOptions(): void {
     this.isUp = this.isUp.map(ele => ele = false);
   }
 
+  public getAlert(): Object {
+    return {
+        'alert-success' : true === this.alerts['status'],
+        'alert-danger' : false === this.alerts['status']
+      };
+  }
 
 }

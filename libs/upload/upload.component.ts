@@ -1,11 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
+
 import { FileItem, FileUploader } from 'ng2-file-upload';
 
 import { TypesEnum } from '../enum/types.enum';
-const URL = 'http://localhost:3000/api-file';
+
 
 @Component({
-  selector: 'app-upload',
+  selector: 'app-vox-upload',
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.css']
 })
@@ -14,32 +15,37 @@ export class UploadComponent implements OnInit {
   @Input() fileExt: string;
   @Input() maxSize: number;
   @Input() url: string;
+  @Input() anexosRequeridos: Array<any>;
 
-  private _extensoes: Array<any>;
-  private _arquivosEnviados: Array<any>;
+  private _extensoes: Array<string>;
   private _limtSize: number;
 
   public alerts: Object;
   public uploader: FileUploader;
+  public rows: Array<number>;
+  public isUp: Array<boolean>;
+  public actions: Object;
 
   constructor() {
+    this._limtSize = 2;  // limite maximo para anexos de arquivos
     this.maxSize = 2;
-    this._limtSize = 10;
+    this.anexosRequeridos = [];
+    this.rows = [];
+    this.isUp = [];
     this.alerts = { status: false, msgs: [] };
+  }
+
+  ngOnInit(): void {
     this.uploader = new FileUploader({
       url: this.url
     });
-  }
 
-
-  ngOnInit(): void {
-
-    this.adicionarArquivo();
+    this.initFile();
 
     if (isNaN(this.maxSize)) {
       const err = `O valor da diretiva <strong>maxSize</strong> deve ser um valor inteiro`;
 
-      this.alerts['status'] = true;
+      this.alerts['status'] = false;
       this.alerts['msgs'].push(err);
 
       return;
@@ -48,7 +54,7 @@ export class UploadComponent implements OnInit {
     if (!this.url) {
       const err = `O valor da diretiva <strong>URL</strong> deve ser informado ex: url="http://localhost:3000/api"`;
 
-      this.alerts['status'] = true;
+      this.alerts['status'] = false;
       this.alerts['msgs'].push(err);
 
       return;
@@ -57,7 +63,7 @@ export class UploadComponent implements OnInit {
     if (this.maxSize > this._limtSize) {
       const err = `Limite para o envio de arquivos é no maximo <strong>${this._limtSize} MB</strong>`;
 
-      this.alerts['status'] = true;
+      this.alerts['status'] = false;
       this.alerts['msgs'].push(err);
 
       return;
@@ -65,26 +71,32 @@ export class UploadComponent implements OnInit {
 
   }
 
-  public adicionarArquivo(): void {
+  public initFile(): void {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
 
       item.withCredentials = false;
       if (!this.isvalidarSize(item)) {
+        item.remove();
         const err = `Error: (Tamanho) O <strong>${item.file.name}</strong> possui tamanho de
                     <strong>${this.formateSize(item.file.size)}</strong>, Tamanho máximo permitido é : <strong>${this.maxSize} MB</strong>`;
-        this.alerts['status'] = true;
+        this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
-        item.remove();
+
+        return;
       }
 
       if (!this.isValidaType(item)) {
-        const err = `Error: (Extensão) o <strong>${item.file.name}</strong> possui extensão invalida. Extensões validas
+        item.remove();
+        const err = `Error: (Extensão) O <strong>${item.file.name}</strong> possui extensão inválida. Extensões validas
                     <strong>${this.msgExtension()}</strong>`;
 
-        this.alerts['status'] = true;
+        this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
-        item.remove();
+
+        return;
       }
+
+      this.alerts['msgs'] = [];
 
     };
 
@@ -93,16 +105,20 @@ export class UploadComponent implements OnInit {
 
         this.alerts['status'] = true;
         this.alerts['msgs'].push(err);
+
+        this.clearTextOptions();
+        item.remove();
     };
 
     this.uploader.onErrorItem = (item: FileItem, response: string) => {
-        const err = `Não possivel enviar o arquivo <strong>${item.file.name}</strong>`;
+        const err = `Não foi possivel enviar o arquivo <strong>${item.file.name}</strong>`;
 
-        this.alerts['status'] = true;
+        this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
 
-        item.remove();
+        this.clearTextOptions();
     };
+
   }
 
   private isvalidarSize(item: FileItem): boolean {
@@ -117,29 +133,27 @@ export class UploadComponent implements OnInit {
     return true;
   }
 
-  public isValidaType(item: FileItem): boolean {
+  private isValidaType(item: FileItem): boolean {
 
     const type = item.file.name.split('.');
     const fileExt = this.fileExt;
 
     if (fileExt) {
-        const fileArray = this.fileExt.split(',');
+        const fileArray = this.fileExt.toString().split(',');
 
         return fileArray.some(types => {
           return types.toLowerCase().trim() === type[type.length - 1];
         });
     }
 
-    const a = this.extension();
-
-    return a.some(types => {
+    return this.extension().some(types => {
       return types.toLowerCase().trim() === type[type.length - 1];
     });
 
   }
 
-  public extension(): Array<string> {
-    return this._extensoes = [TypesEnum.PDF, TypesEnum.PNG, TypesEnum.JPEG, TypesEnum.JPG];
+  private extension(): Array<string> {
+    return this._extensoes = [TypesEnum.PDF, TypesEnum.PNG, TypesEnum.JPEG, TypesEnum.JPG, TypesEnum.CSV];
   }
 
   private msgExtension(): string {
@@ -150,11 +164,11 @@ export class UploadComponent implements OnInit {
     return this.extension().toString().toLocaleUpperCase();
   }
 
-  public formateSize(bytes) {
+  public fileQtd(item: Array<FileItem>): number | string {
+    return item.length === 0 ? 'Não há arquivos anexados' : item.length;
+  }
 
-    if (isNaN(bytes)) {
-      return 'isNaN';
-    }
+  public formateSize(bytes): string {
 
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
 
@@ -174,4 +188,40 @@ export class UploadComponent implements OnInit {
     return `${bytes} ${sizes[i]}`;
 
   }
+
+  public getAnexos(): Array<any> {
+    return this.anexosRequeridos;
+  }
+
+  public icon(icon: string): Array<string> {
+      return this.extension().filter(ext => {
+        return icon === ext;
+      });
+  }
+
+  public changeRow(anexoId: number, idx: number): void {
+    this.rows[idx] = anexoId;
+    this.isUp[idx] = true;
+  }
+
+  public uploadAll(): void {
+    this.uploader.uploadAll();
+  }
+
+  public clearQueue(): void {
+    this.uploader.clearQueue();
+    this.clearTextOptions();
+  }
+
+  private clearTextOptions(): void {
+    this.isUp = this.isUp.map(ele => ele = false);
+  }
+
+  public getAlert(): Object {
+    return {
+        'alert-success' : true === this.alerts['status'],
+        'alert-danger' : false === this.alerts['status']
+      };
+  }
+
 }
