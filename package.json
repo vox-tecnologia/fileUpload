@@ -9,6 +9,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "doc": "compodoc -p src/tsconfig.app.json -s -n \"Vox Upload\"",
     "build:copy": "cp README.md vox/",
     "build:clear": "rm -rf vox/ && rm -rf dist/",
     "build:prod": "ng-packagr -p libs/package.json",
