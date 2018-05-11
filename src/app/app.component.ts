@@ -27,7 +27,7 @@ export class AppComponent {
   }
 
   public getExtesao () {
-    return ['png', 'pdf'];
+    return ['png', 'pdf', 'jpg'];
   }
 
   public anexos() {
@@ -47,6 +47,11 @@ export class AppComponent {
         'id': 3,
         'descricao': 'Habilitação Profissional',
         'extensao': [{'descricao': 'csv'}]
+      },
+      {
+        'id': 4,
+        'descricao': 'Documento',
+        'extensao': [{'descricao': 'word'}]
       }
     ];
 
