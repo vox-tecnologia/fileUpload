@@ -15,7 +15,7 @@ export class AppComponent {
   public extesao: Array<string>;
 
   constructor(
-    private modalService: NgbModal
+     private modalService: NgbModal
   ) {
     this.extesao = [];
     this.getUrl = 'http://localhost:3000/api-file';

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FileItem, FileUploader } from 'ng2-file-upload';
 
 import { TypesEnum } from '../enum/types.enum';
@@ -32,7 +32,6 @@ export class UploadComponent implements OnInit {
   public isUp: Array<boolean>;
   public actions: Object;
   public btn: boolean;
-  private a: Array<any>;
   private fileIndex: Array<any>;
 
   /**
@@ -47,7 +46,6 @@ export class UploadComponent implements OnInit {
     this.rows = [];
     this.isUp = [];
     this.btn = false;
-    this.a = [];
     this.fileIndex = [];
     this.alerts = { status: false, msgs: [] };
   }
@@ -84,9 +82,7 @@ export class UploadComponent implements OnInit {
     }
 
     if (this.maxSize > this._limtSize) {
-      const err = `Limite para o envio de arquivos é no maximo <strong>${
-        this._limtSize
-      } MB</strong>`;
+      const err = `Limite para o envio de arquivos é no maximo <strong>${this._limtSize} MB</strong>`;
 
       this.alerts['status'] = false;
       this.alerts['msgs'].push(err);
@@ -104,17 +100,10 @@ export class UploadComponent implements OnInit {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
       item.withCredentials = false;
 
-      this.setFileItem(item);
       if (!this.isvalidarSize(item)) {
         item.remove();
-        const err = `Error: (Tamanho) O <strong>${
-          item.file.name
-        }</strong> possui tamanho de
-                    <strong>${this.formateSize(
-                      item.file.size
-                    )}</strong>, Tamanho máximo permitido é : <strong>${
-          this.maxSize
-        } MB</strong>`;
+        const err = `Error: (Tamanho) O <strong>${item.file.name}</strong> possui tamanho de
+                    <strong>${this.formateSize(item.file.size)}</strong>, Tamanho máximo permitido é : <strong>${this.maxSize} MB</strong>`;
         this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
 
@@ -123,10 +112,8 @@ export class UploadComponent implements OnInit {
 
       if (!this.isValidaType(item)) {
         item.remove();
-        const err = `Error: (Extensão) O <strong>${
-          item.file.name
-        }</strong> possui extensão inválida. Extensões validas
-                    <strong>${this.msgExtension()}</strong>`;
+        const err = `Error: (Extensão) O <strong>${item.file.name}</strong> possui extensão inválida.
+                    Extensões validas <strong>${this.msgExtension()}</strong>`;
 
         this.alerts['status'] = false;
         this.alerts['msgs'].push(err);
@@ -138,7 +125,7 @@ export class UploadComponent implements OnInit {
     };
 
     this.uploader.onSuccessItem = (item: FileItem, response: string) => {
-      const err = response;
+      const err = JSON.parse(response);
 
       this.alerts['status'] = true;
       this.alerts['msgs'].push(err);
@@ -148,9 +135,8 @@ export class UploadComponent implements OnInit {
     };
 
     this.uploader.onErrorItem = (item: FileItem, response: string) => {
-      const err = `Não foi possivel enviar o arquivo <strong>${
-        item.file.name
-      }</strong>`;
+      const resposta = JSON.parse(response);
+      const err = `Não foi possivel enviar o arquivo <strong>${item.file.name}</strong> ${resposta['mensagem']}`;
 
       this.alerts['status'] = false;
       this.alerts['msgs'].push(err);
@@ -233,9 +219,7 @@ export class UploadComponent implements OnInit {
       return this.fileExt.toString().toLocaleUpperCase();
     }
 
-    return this.extension()
-      .toString()
-      .toLocaleUpperCase();
+    return this.extension().toString().toLocaleUpperCase();
   }
 
   /**
@@ -297,15 +281,12 @@ export class UploadComponent implements OnInit {
     });
   }
 
-  public setFileItem(item: FileItem): void {
-    // this.fileIndex.forEach((ele, i) => {
-    //   this.fileItem[ele] = item;
-    // });
-    // this.fileIndex.map(fileIdx => this.fileItem[fileIdx] = item);
-    // return this.fileItem;
-    //return;
-  }
-
+  /**
+   *
+   *
+   * @returns {Array<FileItem>}
+   * @memberof UploadComponent
+   */
   public getFileItem(): Array<FileItem> {
     return this.fileItem;
   }
@@ -315,11 +296,10 @@ export class UploadComponent implements OnInit {
    * Método responsável verificar qual item da tabela foi selecionado
    * @param {number} anexoId
    * @param {number} idx
-   * @returns {void}
+   * @param {FileItem} queue
    * @memberof UploadComponent
    */
   public changeRow(anexoId: number, idx: number, queue: FileItem): void {
-
     this.rows[idx] = anexoId;
     this.isUp[idx] = true;
 
@@ -335,9 +315,6 @@ export class UploadComponent implements OnInit {
 
     this.duplicateFiles(idx);
 
-    console.log(this.fileIndex, 'fileIndex');
-    console.log(this.fileItem, 'fileItem');
-    console.log(this.uploader.queue, 'queue');
   }
 
   /**
@@ -367,7 +344,7 @@ export class UploadComponent implements OnInit {
 
   /**
    *
-   *
+   * Método responsável limpar os valores da coluna ação
    * @param {Array<FileItem>} queue
    * @param {number} idx
    * @memberof UploadComponent
@@ -393,7 +370,7 @@ export class UploadComponent implements OnInit {
 
   /**
    *
-   *  Método responsável por exibir os status das requisições
+   * Método responsável por exibir os status das requisições
    * @returns {Object}
    * @memberof UploadComponent
    */
@@ -404,13 +381,21 @@ export class UploadComponent implements OnInit {
     };
   }
 
-  private duplicateFiles(idx: number) {
+  /**
+   *
+   * Método responsável por verificar se exister arquivos duplicados, e remover caso haja.
+   * @private
+   * @param {number} idx
+   * @returns {void}
+   * @memberof UploadComponent
+   */
+  private duplicateFiles(idx: number): void {
 
     const fileItemNameQueue = this.uploader.queue.map(fileItem => fileItem.file.name);
 
     const la = this.uploader.queue.filter((itemUploader, i, self) => {
       if (fileItemNameQueue.indexOf(itemUploader.file.name) !== i) {
-        console.log(itemUploader.file);
+
         const ddFile = confirm('arquivo duplicado, desabilitar btn');
         if (ddFile || !ddFile) {
           itemUploader.remove();

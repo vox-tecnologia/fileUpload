@@ -17,7 +17,11 @@
   </div>
   <!-- div.modal-header -->
   <div class="modal-body">
-
+    <!-- <app-vox-upload
+        [url]="getUrl"
+        [fileExt]="getExtesao()"
+        [anexosRequeridos]="anexos()">
+    </app-vox-upload> -->
   </div>
   <!-- div.modal-body -->
   <div class="modal-footer">
@@ -33,10 +37,11 @@
   </button>
 </div>
 
+
 <div class="container">
     <app-vox-upload
-    [url]="getUrl"
-    [fileExt]="getExtesao()"
-    [anexosRequeridos]="anexos()">
-</app-vox-upload>
+        [url]="getUrl"
+        [fileExt]="getExtesao()"
+        [anexosRequeridos]="anexos()">
+    </app-vox-upload>
 </div>
