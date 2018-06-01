@@ -12,9 +12,6 @@
           <!-- div alert -->
           <p>Arquivos selecionados: {{ fileQtd(uploader.queue) }}</p>
 
-          <ul>
-            <li *ngFor="let item of getFileItem(); let idx = index">{{ item?.file.name}}</li>
-          </ul>
           <table class="table table-bordered">
             <thead class="table-striped table-dark">
               <tr class="header">
@@ -74,8 +71,6 @@
                   </div>
                 </div>
               </div>
-              {{ disableUploadAll() }}
-              {{ btn }}
               <button type="button" class="btn btn-success" (click)="uploadAll()" [disabled]="disableUploadAll()">
                 <i class="fa fa-cloud-upload"></i> Enviar
               </button>
