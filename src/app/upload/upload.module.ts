@@ -3,15 +3,12 @@ import { CommonModule } from '@angular/common';
 
 import { FileUploadModule } from 'ng2-file-upload';
 
-import { NgbModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { UploadComponent } from './upload.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    FileUploadModule,
-    NgbModule.forRoot()
+    FileUploadModule
   ],
   exports: [ UploadComponent ],
   declarations: [ UploadComponent ]

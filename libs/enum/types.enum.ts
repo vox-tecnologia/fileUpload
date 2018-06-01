@@ -3,4 +3,5 @@ export enum TypesEnum {
   PNG = 'png',
   JPEG = 'jpeg',
   JPG = 'jpg',
+  CSV = 'csv',
 }

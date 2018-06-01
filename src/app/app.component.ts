@@ -15,7 +15,7 @@ export class AppComponent {
   public extesao: Array<string>;
 
   constructor(
-    private modalService: NgbModal
+     private modalService: NgbModal
   ) {
     this.extesao = [];
     this.getUrl = 'http://localhost:3000/api-file';
@@ -23,15 +23,11 @@ export class AppComponent {
 
 
   public open(content) {
-    this.modalService.open(content, { size: 'lg', centered: true}).result.then((result) => {
-      // this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      // this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
+    this.modalService.open(content, { size: 'lg', centered: true});
   }
 
   public getExtesao () {
-    return ['png', 'pdf'];
+    return ['png', 'pdf', 'jpg'];
   }
 
   public anexos() {
@@ -51,6 +47,11 @@ export class AppComponent {
         'id': 3,
         'descricao': 'Habilitação Profissional',
         'extensao': [{'descricao': 'csv'}]
+      },
+      {
+        'id': 4,
+        'descricao': 'Documento',
+        'extensao': [{'descricao': 'word'}]
       }
     ];
 

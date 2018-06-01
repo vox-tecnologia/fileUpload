@@ -3,13 +3,13 @@
 
 
 ```sh
-$ npm install --global file-upload
+$ npm install --g @voxtecnologia/file-upload
 ```
 
 ## 2. Install Vox Upload in your project devDependencies:
 
 ```sh
-$ npm install --save-dev file-upload
+$ npm install --save-dev @voxtecnologia/file-upload
 ```
 
 ## 3. Setup Module
@@ -17,7 +17,7 @@ $ npm install --save-dev file-upload
 Import UploadModule into your app.module.
 
 ```ts
-import { UploadModule } from 'upload/upload.module';
+import { UploadModule } from '@voxtecnologia/file-upload';
 
 @NgModule({
   ...
@@ -55,3 +55,5 @@ Name      | Type               | Exemples                         | Optional    
 fileExt   | `String`           | `jpg, pdf, txt, icon`            | Yes                   | ` pdf, png, jpeg, jpg, csv`
 maxSize   | `number`           | `10`                             | Yes                   | `2 MB`
 url       | `String`           | `http://localhost:3000/api-file` | No                    | No
+anexosRequeridos | `Array`     | ` const anexos = [{}]`           | No                    | No
+
