@@ -1,42 +1,44 @@
+<div class="container">
+    <button class="btn btn-outline-primary" (click)="open()">
+      <i class="fa fa-2x fa-cloud-upload"></i>
+      <span>Anexar Arquvios</span>
+    </button>
+</div>
+
+<ng-template #modal let-c="close" let-d="dismiss">
+    <div class="modal-header"></div>
+    <div class="modal-body">
       <div class="row">
         <div class="col-md-12">
 
-          <div class="alert alert-error" [ngClass]="getAlert()"
-            *ngIf="alerts['msgs'].length || alerts['status'] === true">
-            <ul>
-              <li *ngFor="let err of alerts['msgs']">
-                <span [innerHTML]="err"></span>
-              </li>
-            </ul>
-          </div>
-          <!-- div alert -->
           <p>Arquivos selecionados: {{ fileQtd(uploader.queue) }}</p>
 
           <table class="table table-bordered">
             <thead class="table-striped table-dark">
               <tr class="header">
                 <th>Descrição de Anexo</th>
-                <th class="text-center">Status</th>
+                <!-- <th class="text-center">Status</th> -->
                 <th class="text-center">Formato</th>
-                <th class="text-center">Nome</th>
+                <!-- <th class="text-center">Nome</th> -->
                 <th class="text-center">Ação</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let anexo of getAnexos(); let idx = index">
-                <td>
+            <tr *ngFor="let anexo of anexos; let idx = index">
+                 <td>
                   {{ anexo?.descricao }}
                 </td>
+                <!--
                 <td class="text-center">
                     <span *ngIf="getFileItem()[idx]?.isSuccess" [ngClass]="{'text-success' : uploader.queue[idx]?.isSuccess}" ><i class="fa fa-2x fa-check-circle"></i></span>
                     <span *ngIf="getFileItem()[idx]?.isCancel" [ngClass]="{'text-warning' : uploader.queue[idx]?.isCancel}"><i class="fa fa-2x fa-exclamation-circle"></i></span>
                     <span *ngIf="getFileItem()[idx]?.isError" [ngClass]="{'text-danger' : uploader.queue[idx]?.isError}"><i class="fa fa-2x fa-times-circle"></i></span>
-                </td>
+                </td> -->
                 <td class="text-center">
                     <i class="fa fa-2x fa-file-{{ icon(anexo.extensao[0].descricao) }}-o"></i>
                     <strong class="file-extensao">{{ anexo.extensao[0].descricao }}</strong>
                 </td>
-                <td>{{ getFileItem()[idx]?.file.name}}</td>
+                <!-- <td>{{ getFileItem()[idx]?.file.name}}</td> -->
                 <td class="text-center">
                   <div class="box-file">
                     <span [hidden]="isUp[idx]">
@@ -51,9 +53,7 @@
                   <button [hidden]="!isUp[idx]" type="button" class="btn btn-danger btn-xs"
                           (click)="clearItem(uploader.queue, idx)">
                       <span class="glyphicon glyphicon-trash"></span> Remove
-
                   </button>
-
                 </td>
               </tr>
             </tbody>
@@ -71,12 +71,55 @@
                   </div>
                 </div>
               </div>
-              <button type="button" class="btn btn-success" (click)="uploadAll()" [disabled]="disableUploadAll()">
-                <i class="fa fa-cloud-upload"></i> Enviar
+              <button type="button" class="btn btn-success" (click)="showTable()" [disabled]="disableUploadAll()">
+                <i class="fa fa-cloud-upload"></i> Visualizar Anexos
               </button>
               <button type="button" class="btn btn-danger" (click)="clearQueue()" [disabled]="!uploader?.queue.length">
                 <i class="fa fa-times-circle"></i> Remover
               </button>
         </div>
       </div>
+  </div>
+  <div class="modal-footer">
 
+  </div>
+</ng-template>
+
+<br/>
+<div class="container" *ngIf="showAnexo">
+    <div
+        class="alert alert-error"
+        [ngClass]="getAlert()"
+        *ngIf="alerts['msgs'].length || alerts['status'] === true">
+    <ul>
+        <li *ngFor="let err of alerts['msgs']">
+            <span [innerHTML]="err"></span>
+        </li>
+    </ul>
+  </div>
+  <!-- div alert -->
+
+
+    <table class="table table-bordered">
+        <thead class="table-striped table-dark">
+          <tr>
+            <th scope="col">Descrição</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let anexo of anexos; let idx = index">
+            <th class="text-left">{{ anexo?.descricao }}</th>
+            <td class="text-center">
+              <span *ngIf="getFileItem()[idx]?.isSuccess" [ngClass]="{'text-success' : uploader.queue[idx]?.isSuccess}" ><i class="fa fa-2x fa-check-circle"></i></span>
+              <span *ngIf="getFileItem()[idx]?.isCancel" [ngClass]="{'text-warning' : uploader.queue[idx]?.isCancel}"><i class="fa fa-2x fa-exclamation-circle"></i></span>
+              <span *ngIf="getFileItem()[idx]?.isError" [ngClass]="{'text-danger' : uploader.queue[idx]?.isError}"><i class="fa fa-2x fa-times-circle"></i></span>
+          </td>
+          </tr>
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-success" (click)="uploadAll()" [disabled]="disableUploadAll()">
+      <i class="fa fa-cloud-upload"></i> Enviar
+    </button>
+</div>

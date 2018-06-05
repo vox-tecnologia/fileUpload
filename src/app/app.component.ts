@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 
 import { UploadComponent } from './upload/upload.component';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { AppService } from './app.services';
 
 @Component({
   selector: 'app-root',
@@ -10,52 +10,33 @@ import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 })
 export class AppComponent {
 
-  public title = 'app';
+  public title = 'Últimos dias de sua VIDA';
   public getUrl: string;
   public extesao: Array<string>;
+  private _anexos: any[];
 
   constructor(
-     private modalService: NgbModal
+    private appService: AppService
   ) {
     this.extesao = [];
     this.getUrl = 'http://localhost:3000/api-file';
   }
 
-
-  public open(content) {
-    this.modalService.open(content, { size: 'lg', centered: true});
+  public loadAnexos() {
+    this.appService.getAnexos().subscribe(
+        (response: Array<any>) => {
+          this._anexos = response;
+        },
+        (error: Response) => console.log(error.text)
+      );
   }
 
   public getExtesao () {
     return ['png', 'pdf', 'jpg'];
   }
 
-  public anexos() {
-
-    const anexos = [
-      {
-        'id': 1,
-        'descricao': 'Certificado de controle de pragas',
-        'extensao': [{'descricao': 'pdf'}]
-      },
-      {
-        'id': 2,
-        'descricao': 'Memorial descritivo',
-        'extensao': [{'descricao': 'jpg'}]
-      },
-      {
-        'id': 3,
-        'descricao': 'Habilitação Profissional',
-        'extensao': [{'descricao': 'csv'}]
-      },
-      {
-        'id': 4,
-        'descricao': 'Documento',
-        'extensao': [{'descricao': 'word'}]
-      }
-    ];
-
-    return anexos;
+  public get anexos() {
+    return this._anexos;
   }
 
 }
