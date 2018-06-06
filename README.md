@@ -76,12 +76,11 @@ export class AppComponent {
 </app-vox-upload>
 ```
 
-
 ## 7. Usage and options
 
 Name      | Type               | Exemples                         | Optional              | Options Default        
 ---       | ---                | ---                              | ----                  | ---
-fileExt   | `String`           | `jpg, pdf, txt, icon`            | Yes                   | ` pdf, png, jpeg, jpg, csv`
+fileExt   | `String`           | `jpg, pdf, txt, icon`            | Yes                   | ` pdf, png, jpeg, jpg, csv, doc, docx`
 maxSize   | `number`           | `10`                             | Yes                   | `2 MB`
 url       | `String`           | `http://localhost:3000/api-file` | No                    | No
 anexosRequeridos | `Array`     | ` const anexos = [{}]`           | No                    | No
