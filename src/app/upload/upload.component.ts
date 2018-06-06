@@ -1,8 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FileItem, FileUploader } from 'ng2-file-upload';
+import {
+  Component,
+  OnInit,
+  Input,
+  ElementRef,
+  ViewChild
+} from '@angular/core';
 
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FileItem, FileUploader } from 'ng2-file-upload';
 import { TypesEnum } from '../enum/types.enum';
+import { UploadService } from './upload.service';
 
 /**
  *
@@ -21,32 +28,37 @@ export class UploadComponent implements OnInit {
   @Input() maxSize: number;
   @Input() url: string;
   @Input() anexosRequeridos: Array<any>;
+  @ViewChild('modal') private _content: ElementRef;
 
   private _extensoes: Array<string>;
+  private _fileIndex: Array<any>;
   private _limtSize: number;
-  public fileItem: Array<any>;
+  private _showTable: boolean;
+  private _modalRef: NgbModalRef;
 
+  public fileItem: Array<any>;
   public alerts: Object;
   public uploader: FileUploader;
   public rows: Array<number>;
   public isUp: Array<boolean>;
   public actions: Object;
   public btn: boolean;
-  private fileIndex: Array<any>;
+
 
   /**
    * Creates an instance of UploadComponent.
    * @memberof UploadComponent
    */
-  constructor() {
+  constructor(private modalService: NgbModal) {
     this._limtSize = 2; // limite maximo para anexos de arquivos
+    this._fileIndex = [];
+    this._showTable = false;
     this.fileItem = [];
     this.maxSize = 2;
     this.anexosRequeridos = [];
     this.rows = [];
     this.isUp = [];
     this.btn = false;
-    this.fileIndex = [];
     this.alerts = { status: false, msgs: [] };
   }
 
@@ -57,6 +69,7 @@ export class UploadComponent implements OnInit {
    * @memberof UploadComponent
    */
   ngOnInit(): void {
+
     this.uploader = new FileUploader({
       url: this.url
     });
@@ -92,6 +105,16 @@ export class UploadComponent implements OnInit {
   }
 
   /**
+   *
+   * Método responsável por abrir o modal
+   * @private
+   * @memberof UploadComponent
+   */
+  private open(): void {
+    this._modalRef = this.modalService.open(this._content, { size: 'lg', centered: true});
+  }
+
+  /**
    * Método responsável por executar os metódos do FileUploader
    * @returns {void}
    * @memberof UploadComponent
@@ -99,7 +122,6 @@ export class UploadComponent implements OnInit {
   public initFile(): void {
     this.uploader.onAfterAddingFile = (item: FileItem) => {
       item.withCredentials = false;
-
       if (!this.isvalidarSize(item)) {
         item.remove();
         const err = `Error: (Tamanho) O <strong>${item.file.name}</strong> possui tamanho de
@@ -125,18 +147,20 @@ export class UploadComponent implements OnInit {
     };
 
     this.uploader.onSuccessItem = (item: FileItem, response: string) => {
-      const err = JSON.parse(response);
+      const res = JSON.parse(response);
+      const err = `Os seguintes arquivos <strong>${item.file.name}</strong> ${res.mensagem}`;
 
       this.alerts['status'] = true;
       this.alerts['msgs'].push(err);
 
       this.clearTextOptions();
       item.remove();
+
     };
 
     this.uploader.onErrorItem = (item: FileItem, response: string) => {
-      const resposta = JSON.parse(response);
-      const err = `Não foi possivel enviar o arquivo <strong>${item.file.name}</strong> ${resposta['mensagem']}`;
+      const res = JSON.parse(response);
+      const err = `Não foi possivel enviar o arquivo <strong>${item.file.name}</strong> ${res}`;
 
       this.alerts['status'] = false;
       this.alerts['msgs'].push(err);
@@ -173,6 +197,7 @@ export class UploadComponent implements OnInit {
    * @memberof UploadComponent
    */
   private isValidaType(item: FileItem): boolean {
+
     const type = item.file.name.split('.');
     const fileExt = this.fileExt;
 
@@ -265,7 +290,7 @@ export class UploadComponent implements OnInit {
    * @returns {Array<any>}
    * @memberof UploadComponent
    */
-  public getAnexos(): Array<any> {
+  public get anexos(): Array<any> {
     return this.anexosRequeridos;
   }
 
@@ -303,13 +328,13 @@ export class UploadComponent implements OnInit {
     this.rows[idx] = anexoId;
     this.isUp[idx] = true;
 
-    this.fileIndex.push(idx);
+    this._fileIndex.push(idx);
 
-    this.fileIndex = this.fileIndex.filter((ele, i, self) => {
+    this._fileIndex = this._fileIndex.filter((ele, i, self) => {
       return self.indexOf(ele) === i;
     });
 
-    this.fileIndex.forEach((ele, i) => {
+    this._fileIndex.forEach((ele, i) => {
       this.fileItem[idx] = queue[i];
     });
 
@@ -327,7 +352,7 @@ export class UploadComponent implements OnInit {
   }
 
   public disableUploadAll(): boolean {
-    return !this.uploader.getNotUploadedItems().length || this.btn;
+    return !this.uploader.getNotUploadedItems().length;
   }
 
   /**
@@ -339,7 +364,7 @@ export class UploadComponent implements OnInit {
     this.uploader.clearQueue();
     this.clearTextOptions();
     this.fileItem = [];
-    this.fileIndex = [];
+    this._fileIndex = [];
   }
 
   /**
@@ -354,7 +379,7 @@ export class UploadComponent implements OnInit {
     queue.splice(idx, 1);
     this.fileItem[idx] = undefined;
     this.isUp[idx] = false;
-
+    this.uploader.clearQueue();
     this.btn = false;
   }
   /**
@@ -396,8 +421,8 @@ export class UploadComponent implements OnInit {
     const la = this.uploader.queue.filter((itemUploader, i, self) => {
       if (fileItemNameQueue.indexOf(itemUploader.file.name) !== i) {
 
-        const ddFile = confirm('arquivo duplicado, desabilitar btn');
-        if (ddFile || !ddFile) {
+        const duplicateFile = confirm('arquivos duplicados serão removidos');
+        if (duplicateFile || !duplicateFile) {
           itemUploader.remove();
           this.fileItem[idx] = undefined;
           this.isUp[idx] = false;
@@ -407,4 +432,14 @@ export class UploadComponent implements OnInit {
 
     this.btn = true;
   }
+
+  private showTable(): void {
+    this._modalRef.close();
+    this._showTable = true;
+  }
+
+  public get showAnexo() {
+    return this._showTable;
+  }
+
 }
