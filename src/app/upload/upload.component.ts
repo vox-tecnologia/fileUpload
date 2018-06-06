@@ -9,7 +9,6 @@ import {
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FileItem, FileUploader } from 'ng2-file-upload';
 import { TypesEnum } from '../enum/types.enum';
-import { UploadService } from './upload.service';
 
 /**
  *
