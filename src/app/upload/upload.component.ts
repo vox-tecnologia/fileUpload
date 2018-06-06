@@ -241,7 +241,8 @@ export class UploadComponent implements OnInit, OnDestroy {
       TypesEnum.JPEG,
       TypesEnum.JPG,
       TypesEnum.CSV,
-      TypesEnum.WORD
+      TypesEnum.DOC,
+      TypesEnum.DOCX,
     ]);
   }
 

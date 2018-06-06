@@ -4,5 +4,6 @@ export enum TypesEnum {
   JPEG = 'jpeg',
   JPG = 'jpg',
   CSV = 'csv',
-  WORD = 'word'
+  DOC = 'doc',
+  DOCX = 'docx'
 }
