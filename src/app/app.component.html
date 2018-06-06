@@ -9,18 +9,30 @@
         />
       </div>
     </div>
+
     <div class="col-md-12">
         <div class="text-center">
         <app-vox-upload [url]="getUrl" [fileExt]="getExtesao()" [anexosRequeridos]="anexos">
         </app-vox-upload>
       </div>
     </div>
-    <div class="col-md-12">
+
+    <div class="col-md-6">
       <div class="text-center">
         <button class="btn btn-primary" (click)="loadAnexos()">
           carregar lista de anexos
         </button>
       </div>
       </div>
+
+      <div class="col-md-6">
+        <div class="text-center">
+          <button class="btn btn-warning" (click)="sendFiles()">
+            ENVIAR ARQUIVOS
+          </button>
+        </div>
+        </div>
   </div>
 </div>
+
+
