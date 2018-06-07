@@ -1,7 +1,7 @@
 const copydir = require('copy-dir');
 
 const origin = ['./src/app/enum', './src/app/upload'];
-const dest = ['./libs', './libs'];
+const dest = ['./libs/enum', './libs/upload'];
 
 for (let index = 0; index < 2; index++) {
 

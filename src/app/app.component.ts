@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 
 import { UploadComponent } from './upload/upload.component';
 import { AppService } from './app.services';
+import { UploadService } from './upload/upload.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,8 @@ export class AppComponent {
   private _anexos: any[];
 
   constructor(
-    private appService: AppService
+    private appService: AppService,
+    private uploadService: UploadService,
   ) {
     this.extesao = [];
     this.getUrl = 'http://localhost:3000/api-file';
@@ -37,6 +39,10 @@ export class AppComponent {
 
   public get anexos() {
     return this._anexos;
+  }
+
+  public sendFiles() {
+    this.uploadService.sendFile();
   }
 
 }

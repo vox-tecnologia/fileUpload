@@ -12,9 +12,10 @@ export class UploadService {
     this.loaderState = this._loaderSubject.asObservable();
   }
 
-  public openModal(modal: boolean): void {
+  public sendFile(): void {
     this._loaderSubject.next({
-      modal: modal
+      show: true
     });
   }
+
 }

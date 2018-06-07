@@ -9,7 +9,7 @@ $ npm install --g @voxtecnologia/file-upload
 ## 2. Install Vox Upload in your project devDependencies:
 
 ```sh
-$ npm install --save-dev @voxtecnologia/file-upload
+$ npm install --save @voxtecnologia/file-upload
 ```
 
 ## 3. Setup Module
@@ -26,17 +26,46 @@ import { UploadModule } from '@voxtecnologia/file-upload';
   ],
 })
 ```
-## 4. Setup 
 
-Default
+## 4 . Setup Component
+Import UploadService into your app.component
 
-```html
-<app-vox-upload
-  [url]="getUrl">
-</app-upload>
+```ts
+import { Component } from '@angular/core';
+import { UploadService } from '@voxtecnologia/file-upload';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+    public title = 'app';
+    
+    constructor(
+      private uploadService: UploadService,
+    ) {
+      
+    public sendFiles() {
+      this.uploadService.sendFile();
+    }
+}
+
 ```
+## 5 . Setup Angular JSON
 
-Custom
+* add bootstrap dependency
+* add font-awesome
+
+`angular.json or .angular-cli.json` 
+```ts
+  "styles": [
+      "node_modules/bootstrap/dist/css/bootstrap.min.css",
+      "../node_modules/font-awesome/css/font-awesome.css",
+      "src/styles.css"
+    ],
+```
+## 6. Setup on View
 
 ```html
 <app-vox-upload
@@ -47,12 +76,11 @@ Custom
 </app-vox-upload>
 ```
 
-
-## 5. Usage and options
+## 7. Usage and options
 
 Name      | Type               | Exemples                         | Optional              | Options Default        
 ---       | ---                | ---                              | ----                  | ---
-fileExt   | `String`           | `jpg, pdf, txt, icon`            | Yes                   | ` pdf, png, jpeg, jpg, csv`
+fileExt   | `String`           | `jpg, pdf, txt, icon`            | Yes                   | ` pdf, png, jpeg, jpg, csv, doc, docx`
 maxSize   | `number`           | `10`                             | Yes                   | `2 MB`
 url       | `String`           | `http://localhost:3000/api-file` | No                    | No
 anexosRequeridos | `Array`     | ` const anexos = [{}]`           | No                    | No

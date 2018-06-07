@@ -3,9 +3,10 @@ import {
   OnInit,
   Input,
   ElementRef,
+  OnDestroy,
   ViewChild
 } from '@angular/core';
-
+import { Subscription } from 'rxjs';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FileItem, FileUploader } from 'ng2-file-upload';
 import { TypesEnum } from '../enum/types.enum';
@@ -23,7 +24,7 @@ import { UploadService } from './upload.service';
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.css']
 })
-export class UploadComponent implements OnInit {
+export class UploadComponent implements OnInit, OnDestroy {
   @Input() fileExt: string;
   @Input() maxSize: number;
   @Input() url: string;
@@ -35,6 +36,7 @@ export class UploadComponent implements OnInit {
   private _limtSize: number;
   private _showTable: boolean;
   private _modalRef: NgbModalRef;
+  private _subscription: Subscription;
 
   public fileItem: Array<any>;
   public alerts: Object;
@@ -43,13 +45,17 @@ export class UploadComponent implements OnInit {
   public isUp: Array<boolean>;
   public actions: Object;
   public btn: boolean;
+  public show: boolean;
 
 
   /**
    * Creates an instance of UploadComponent.
    * @memberof UploadComponent
    */
-  constructor(private modalService: NgbModal) {
+  constructor(
+    private modalService: NgbModal,
+    private uploadService: UploadService
+  ) {
     this._limtSize = 2; // limite maximo para anexos de arquivos
     this._fileIndex = [];
     this._showTable = false;
@@ -59,6 +65,7 @@ export class UploadComponent implements OnInit {
     this.rows = [];
     this.isUp = [];
     this.btn = false;
+    this.show = false;
     this.alerts = { status: false, msgs: [] };
   }
 
@@ -69,6 +76,12 @@ export class UploadComponent implements OnInit {
    * @memberof UploadComponent
    */
   ngOnInit(): void {
+
+    this._subscription = this.uploadService.loaderState.subscribe(state => {
+      if (state.show) {
+        this.uploader.uploadAll();
+      }
+    });
 
     this.uploader = new FileUploader({
       url: this.url
@@ -228,7 +241,8 @@ export class UploadComponent implements OnInit {
       TypesEnum.JPEG,
       TypesEnum.JPG,
       TypesEnum.CSV,
-      TypesEnum.WORD
+      TypesEnum.DOC,
+      TypesEnum.DOCX,
     ]);
   }
 
@@ -342,15 +356,6 @@ export class UploadComponent implements OnInit {
 
   }
 
-  /**
-   * Método responsável por enviar todos os arquivos na Queue[]
-   * @returns {void}
-   * @memberof UploadComponent
-   */
-  public uploadAll(): void {
-    this.uploader.uploadAll();
-  }
-
   public disableUploadAll(): boolean {
     return !this.uploader.getNotUploadedItems().length;
   }
@@ -442,4 +447,7 @@ export class UploadComponent implements OnInit {
     return this._showTable;
   }
 
+  ngOnDestroy(): void {
+    this._subscription.unsubscribe();
+  }
 }
